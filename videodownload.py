@@ -1,29 +1,43 @@
-from pytube import YouTube
+import yt_dlp as youtube_dl
 import os
-
 
 def baixar_video(link, destino):
     try:
-        video = YouTube(link).streams.get_highest_resolution()
-        arquivo = video.download(output_path=destino)
-        msg = 'Download do vídeo realizado!'
+        print(f"Tentando baixar o vídeo do link: {link}")
+        ydl_opts = {
+            'format': 'bestvideo+bestaudio/best',
+            'outtmpl': os.path.join(destino, '%(title)s.%(ext)s'),
+            'merge_output_format': 'mp4',
+            'postprocessors': [{
+                'key': 'FFmpegVideoConvertor',
+                'preferedformat': 'mp4',
+            }]
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(link, download=True)
+            arquivo = ydl.prepare_filename(info_dict)
+        msg = f'Download do vídeo realizado! Arquivo salvo em: {arquivo}'
     except Exception as e:
         msg = f"Falha no download do vídeo: {str(e)}"
     finally:
         return msg
 
-
 def baixar_audio(link, destino):
     try:
-        audio = YouTube(link).streams.filter(only_audio=True).first()
-        arquivo = audio.download(output_path=destino)
-
-        # salvando o arquivo como mp3
-        base, ext = os.path.splitext(arquivo)
-        novo_nome = f"{base}.mp3"
-        os.rename(arquivo, novo_nome)
-
-        msg = 'Download do áudio realizado.'
+        print(f"Tentando baixar o áudio do link: {link}")
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'outtmpl': os.path.join(destino, '%(title)s.%(ext)s'),
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }]
+        }
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(link, download=True)
+            arquivo = ydl.prepare_filename(info_dict).replace('.webm', '.mp3').replace('.m4a', '.mp3')
+        msg = f'Download realizado!'
     except Exception as e:
         msg = f'Falha no download do áudio: {str(e)}'
     finally:
