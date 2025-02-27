@@ -1,5 +1,6 @@
 import os.path
 import customtkinter
+import sys
 from tkinter.filedialog import askdirectory
 from videodownload import baixar_video, baixar_audio
 from PIL import Image
@@ -11,8 +12,9 @@ window = customtkinter.CTk()
 window.geometry("550x200")
 window.title("YouTube Downloader MP4 e MP3")
 
-script_dir = getattr(window, '_MEIPASS', os.path.dirname(os.path.realpath(__file__)))
-img_path = os.path.join(script_dir, r"C:/Users/Usuario/Documents/Python/YouTube Video/bg.png")
+script_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+img_path = os.path.join(script_dir, "bg.png")
+
 
 img = customtkinter.CTkImage(Image.open(img_path), size=(430, 510))
 img_label = customtkinter.CTkLabel(window, image=img, text='')
